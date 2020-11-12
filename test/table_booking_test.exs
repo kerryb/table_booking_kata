@@ -7,8 +7,26 @@ defmodule TableBookingTest do
       assert reserve([]) == [[], ""]
     end
 
-    test "can accept a simple booking" do
+    test "accepts a single booking" do
       assert reserve([2]) == [["table for two"], ""]
+    end
+
+    test "accepts bookings that exactly match the capacity" do
+      assert reserve([2, 2, 2, 2, 3, 3, 4, 4, 6, 8]) == [
+               [
+                 "table for two",
+                 "table for two",
+                 "table for two",
+                 "table for two",
+                 "table for three",
+                 "table for three",
+                 "table for four",
+                 "table for four",
+                 "table for six",
+                 "table for eight"
+               ],
+               ""
+             ]
     end
   end
 end
