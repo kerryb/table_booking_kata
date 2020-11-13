@@ -28,5 +28,16 @@ defmodule TableBookingTest do
                ""
              ]
     end
+
+    test "rejects bookings when no suitable tables are left" do
+      assert reserve([2, 8, 2, 8]) == [
+               [
+                 "table for two",
+                 "table for eight",
+                 "table for two",
+               ],
+               "Bookings at the following indexes were not accepted: 3"
+             ]
+    end
   end
 end
