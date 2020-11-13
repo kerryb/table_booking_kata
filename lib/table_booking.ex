@@ -107,7 +107,11 @@ defmodule TableBooking do
   end
 
   defp output_failed_bookings(bookings) do
-    indexes_output = bookings.unaccepted_bookings |> Enum.map(& &1.index) |> Enum.join(", ")
+    indexes_output = bookings.unaccepted_bookings
+                     |> Enum.reverse()
+                     |> Enum.map(& &1.index)
+                     |> Enum.join(", ")
+
     "Bookings at the following indexes were not accepted: #{indexes_output}"
   end
 end
