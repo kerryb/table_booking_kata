@@ -34,9 +34,19 @@ defmodule TableBookingTest do
                [
                  "table for two",
                  "table for eight",
-                 "table for two",
+                 "table for two"
                ],
                "Bookings at the following indexes were not accepted: 3"
+             ]
+    end
+
+    test "accepts bookings that leave one empty place" do
+      assert reserve([1]) == [["table for one"], ""]
+    end
+
+    test "rejects bookings that leave more than one empty place" do
+      assert reserve([1, 1, 1, 1, 1]) == [["table for one", "table for one", "table for one", "table for one", ],
+               "Bookings at the following indexes were not accepted: 4"
              ]
     end
   end

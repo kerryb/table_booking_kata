@@ -79,8 +79,8 @@ defmodule TableBooking do
   end
 
   defp find_suitable_table(request, tables) do
-    case Enum.split_while(tables, &too_small?(&1, request)) do
-      {_too_small, []} ->
+    case Enum.split_while(tables, &unsuitable?(&1, request)) do
+      {_unsuitable, []} ->
         :error
 
       {too_small, [suitable | remainder]} ->
@@ -88,8 +88,8 @@ defmodule TableBooking do
     end
   end
 
-  defp too_small?(table, request) do
-    table.capacity < request.number_of_people
+  defp unsuitable?(table, request) do
+    table.capacity < request.number_of_people or table.capacity - request.number_of_people > 1
   end
 
   defp format_output(bookings) do
