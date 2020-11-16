@@ -69,33 +69,18 @@ defmodule TableBooking do
     %__MODULE__{requested_bookings: Request.new_list(bookings)}
   end
 
-  defp process_requested_bookings(%{requested_bookings: []} = bookings) do
-    bookings
+  defp process_requested_bookings(bookings) do
+    Enum.reduce(bookings.requested_bookings, bookings, &process_requested_booking/2)
   end
 
-  defp process_requested_bookings(
-         %{requested_bookings: [request | remaining_requests]} = bookings
-       ) do
-    request
-    |> find_suitable_table(bookings.empty_tables)
-    |> case do
-        :error ->
-          %{
-            bookings
-            | requested_bookings: remaining_requests,
-              unaccepted_bookings: [request | bookings.unaccepted_bookings]
-          }
+  defp process_requested_booking(requested_booking, bookings) do
+    case find_suitable_table(requested_booking, bookings.empty_tables) do
+      :error ->
+        %{ bookings | unaccepted_bookings: [requested_booking | bookings.unaccepted_bookings] }
 
-        {:ok, table, remaining_tables} ->
-          %{
-            bookings
-            | requested_bookings: remaining_requests,
-              empty_tables: remaining_tables,
-              booked_tables: [table | bookings.booked_tables]
-          }
-      end
-
-      |> process_requested_bookings()
+      {:ok, table, remaining_tables} ->
+        %{ bookings | empty_tables: remaining_tables, booked_tables: [table | bookings.booked_tables] }
+    end
   end
 
   defp find_suitable_table(request, tables) do
