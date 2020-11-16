@@ -101,9 +101,7 @@ defmodule TableBooking do
     |> Enum.map(&Table.output/1)
   end
 
-  defp output_failed_bookings(%{rejected: []} = _state) do
-    ""
-  end
+  defp output_failed_bookings(%{rejected: []} = _state), do: ""
 
   defp output_failed_bookings(state) do
     indexes_output =
