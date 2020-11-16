@@ -1,7 +1,18 @@
 defmodule TableBooking.Request do
+  @moduledoc """
+  A struct representing  a request, which has a number of people and an index.
+
+  Note: like many functional languages, Elixir has lists rather than arrays, so
+  we need to make the indexes explicit.
+  """
+
   @enforce_keys [:number_of_people, :index]
   defstruct [:number_of_people, :index]
 
+  @doc """
+  Given a list of integers representing numbers of people, wrap each one in a
+  `TableBooking.Request` struct.
+  """
   def new_list(requests) do
     requests
     |> Enum.with_index()
@@ -10,6 +21,10 @@ defmodule TableBooking.Request do
 end
 
 defmodule TableBooking.Table do
+  @moduledoc """
+  A struct representing a table, which may or not be booked.
+  """
+
   @numbers_as_words %{
     1 => "one",
     2 => "two",
@@ -30,6 +45,10 @@ defmodule TableBooking.Table do
 end
 
 defmodule TableBooking do
+  @moduledoc """
+  The main module, which also defines a top-level struct. This struct is passed
+  through a pipeline of functions, eventually producing the required output.
+  """
   alias TableBooking.{Request, Table}
 
   @tables Enum.map([2, 2, 2, 2, 3, 3, 4, 4, 6, 8], &%Table{capacity: &1})
