@@ -76,8 +76,9 @@ defmodule TableBooking do
   defp process_requested_bookings(
          %{requested_bookings: [request | remaining_requests]} = bookings
        ) do
-    bookings =
-      case find_suitable_table(request, bookings.empty_tables) do
+    request
+    |> find_suitable_table(bookings.empty_tables)
+    |> case do
         :error ->
           %{
             bookings
@@ -94,7 +95,7 @@ defmodule TableBooking do
           }
       end
 
-    process_requested_bookings(bookings)
+      |> process_requested_bookings()
   end
 
   defp find_suitable_table(request, tables) do
