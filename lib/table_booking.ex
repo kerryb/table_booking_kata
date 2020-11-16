@@ -25,23 +25,19 @@ defmodule TableBooking.Table do
   A struct representing a table, which may or not be booked.
   """
 
-  @numbers_as_words %{
-    1 => "one",
-    2 => "two",
-    3 => "three",
-    4 => "four",
-    5 => "five",
-    6 => "six",
-    7 => "seven",
-    8 => "eight"
-  }
-
   @enforce_keys :capacity
   defstruct capacity: nil, booked_for: nil
 
-  def output(table) do
-    "table for #{@numbers_as_words[table.booked_for]}"
-  end
+  def output(table), do: "table for #{word_for(table.booked_for)}"
+
+  defp word_for(1), do: "one"
+  defp word_for(2), do: "two"
+  defp word_for(3), do: "three"
+  defp word_for(4), do: "four"
+  defp word_for(5), do: "five"
+  defp word_for(6), do: "six"
+  defp word_for(7), do: "seven"
+  defp word_for(8), do: "eight"
 end
 
 defmodule TableBooking do
