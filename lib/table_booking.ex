@@ -53,30 +53,27 @@ defmodule TableBooking do
 
   @tables Enum.map([2, 2, 2, 2, 3, 3, 4, 4, 6, 8], &%Table{capacity: &1})
 
-  defstruct requested_bookings: [],
-            unaccepted_bookings: [],
-            empty_tables: @tables,
-            booked_tables: []
+  defstruct bookings: [], rejected: [], empty_tables: @tables, booked_tables: []
 
   def reserve(bookings) do
     bookings
     |> new()
-    |> process_requested_bookings()
+    |> process_bookings()
     |> format_output()
   end
 
   defp new(bookings) do
-    %__MODULE__{requested_bookings: Request.new_list(bookings)}
+    %__MODULE__{bookings: Request.new_list(bookings)}
   end
 
-  defp process_requested_bookings(bookings) do
-    Enum.reduce(bookings.requested_bookings, bookings, &process_requested_booking/2)
+  defp process_bookings(bookings) do
+    Enum.reduce(bookings.bookings, bookings, &process_requested_booking/2)
   end
 
   defp process_requested_booking(requested_booking, bookings) do
     case find_suitable_table(requested_booking, bookings.empty_tables) do
       :error ->
-        %{ bookings | unaccepted_bookings: [requested_booking | bookings.unaccepted_bookings] }
+        %{bookings | rejected: [requested_booking | bookings.rejected]}
 
       {:ok, table, remaining_tables} ->
         %{ bookings | empty_tables: remaining_tables, booked_tables: [table | bookings.booked_tables] }
@@ -107,13 +104,13 @@ defmodule TableBooking do
     |> Enum.map(&Table.output/1)
   end
 
-  defp output_failed_bookings(%{unaccepted_bookings: []} = _bookings) do
+  defp output_failed_bookings(%{rejected: []} = _bookings) do
     ""
   end
 
   defp output_failed_bookings(bookings) do
     indexes_output =
-      bookings.unaccepted_bookings
+      bookings.rejected
       |> Enum.reverse()
       |> Enum.map(& &1.index)
       |> Enum.join(", ")
