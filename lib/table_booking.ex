@@ -46,8 +46,9 @@ end
 
 defmodule TableBooking do
   @moduledoc """
-  The main module, which also defines a top-level struct. This struct is passed
-  through a pipeline of functions, eventually producing the required output.
+  The main module, which also defines a top-level struct to hold the state of
+  the data as it is processed. This struct is passed through a pipeline of
+  functions, eventually producing the required output.
   """
   alias TableBooking.{Request, Table}
 
@@ -66,17 +67,17 @@ defmodule TableBooking do
     %__MODULE__{bookings: Request.new_list(bookings)}
   end
 
-  defp process_bookings(bookings) do
-    Enum.reduce(bookings.bookings, bookings, &process_requested_booking/2)
+  defp process_bookings(state) do
+    Enum.reduce(state.bookings, state, &process_booking/2)
   end
 
-  defp process_requested_booking(requested_booking, bookings) do
-    case find_suitable_table(requested_booking, bookings.empty_tables) do
+  defp process_booking(booking, state) do
+    case find_suitable_table(booking, state.empty_tables) do
       :error ->
-        %{bookings | rejected: [requested_booking | bookings.rejected]}
+        %{state | rejected: [booking | state.rejected]}
 
       {:ok, table, remaining_tables} ->
-        %{ bookings | empty_tables: remaining_tables, booked_tables: [table | bookings.booked_tables] }
+        %{state | empty_tables: remaining_tables, booked_tables: [table | state.booked_tables]}
     end
   end
 
@@ -94,23 +95,23 @@ defmodule TableBooking do
     table.capacity < request.number_of_people or table.capacity - request.number_of_people > 1
   end
 
-  defp format_output(bookings) do
-    [output_successful_bookings(bookings), output_failed_bookings(bookings)]
+  defp format_output(state) do
+    [output_successful_bookings(state), output_failed_bookings(state)]
   end
 
-  defp output_successful_bookings(bookings) do
-    bookings.booked_tables
+  defp output_successful_bookings(state) do
+    state.booked_tables
     |> Enum.reverse()
     |> Enum.map(&Table.output/1)
   end
 
-  defp output_failed_bookings(%{rejected: []} = _bookings) do
+  defp output_failed_bookings(%{rejected: []} = _state) do
     ""
   end
 
-  defp output_failed_bookings(bookings) do
+  defp output_failed_bookings(state) do
     indexes_output =
-      bookings.rejected
+      state.rejected
       |> Enum.reverse()
       |> Enum.map(& &1.index)
       |> Enum.join(", ")
